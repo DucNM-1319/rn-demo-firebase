@@ -9,6 +9,7 @@
   "dependencies": {
     "react": "16.5.0",
     "react-native": "0.57.0",
+    "react-native-firebase": "^5.0.0",
     "react-navigation": "^2.14.2"
   },
   "devDependencies": {

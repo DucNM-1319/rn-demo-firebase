@@ -137,7 +137,16 @@ android {
 }
 
 dependencies {
+    // This should be here already
+    implementation(project(':react-native-firebase')) {
+        transitive = false
+    }
+
+    // Firebase dependencies
+    implementation "com.google.firebase:firebase-core:16.0.3"
+    implementation "com.google.firebase:firebase-auth:16.0.3"
     implementation fileTree(dir: "libs", include: ["*.jar"])
+    //noinspection GradleCompatible
     implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
     implementation "com.facebook.react:react-native:+"  // From node_modules
 }
@@ -148,3 +157,5 @@ task copyDownloadableDepsToLibs(type: Copy) {
     from configurations.compile
     into 'libs'
 }
+
+apply plugin: 'com.google.gms.google-services'
