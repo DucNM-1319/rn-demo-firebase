@@ -1,37 +1,46 @@
 import React from 'react'
-import { StyleSheet, Text, TextInput, View, Button, Alert } from 'react-native'
+import { StyleSheet, Text, TextInput, View, Alert } from 'react-native'
 import firebase from 'react-native-firebase'
+import Button from 'react-native-button'
+import { connect } from 'react-redux'
 
-export default class Login extends React.Component {
-  state = { email: '', password: '', errorMessage: null }
+import * as ActionTypes from './../redux/actionTypes'
+
+class Login extends React.Component {
+  state = { loaded: false, email: '', password: '', errorMessage: null }
 
   handleLogin = () => {
-    const { email, password } = this.state
-    console.log(password)
-    if(email.trim() != "" && password.trim() != "") {
-    firebase
-      .auth()
-      .signInWithEmailAndPassword(email, password)
-      .then(() => this.props.navigation.navigate('Main'))
-      .catch(error => this.setState({ errorMessage: error.message }))
+    let userInfo = {
+      email: this.state.email,
+      password: this.state.password
+    }
+    if (userInfo.email.trim() != "" && userInfo.password.trim() != "") {
+      this.props.dispatch({type: ActionTypes.LOGIN, userInfo})
     } else {
       Alert.alert(
         'Warning',
         'Enter email and password',
         [
-          {text: 'OK', onPress: () => console.log('OK Pressed')},
+          { text: 'OK', onPress: () => console.log('OK Pressed') },
         ],
         { cancelable: true }
       )
     }
   }
 
+  componentWillReceiveProps(nextProps) {
+    console.log('login componentWillReceiveProps', JSON.stringify(nextProps.user))
+    if(nextProps.user.userInfo) {
+      this.props.navigation.navigate('Main')
+    }
+  }
+
   render() {
     return (
       <View style={styles.container}>
-        <Text>Login</Text>
+        <Text style={{color: '#47525E', fontSize: 30, marginBottom: 30}}>Sign in</Text>
         {this.state.errorMessage &&
-          <Text style={{ color: 'red' }}>
+          <Text style={{ color: 'red', fontSize:50 }}>
             {this.state.errorMessage}
           </Text>}
         <TextInput
@@ -49,11 +58,10 @@ export default class Login extends React.Component {
           onChangeText={password => this.setState({ password })}
           value={this.state.password}
         />
-        <Button title="Login" onPress={this.handleLogin} />
-        <Button
-          title="Don't have an account? Sign Up"
+        <Button onPress={this.handleLogin} >Login</Button>
+        <Button style={{marginTop: 10}}
           onPress={() => this.props.navigation.navigate('SignUp')}
-        />
+        >Don't have an account? Sign Up</Button>
       </View>
     )
   }
@@ -66,9 +74,19 @@ const styles = StyleSheet.create({
   },
   textInput: {
     height: 40,
-    width: '90%',
-    borderColor: 'gray',
+    width: '80%',
+    borderColor: '#8492A6',
     borderWidth: 1,
-    marginTop: 8
+    marginBottom: 10
   }
 })
+
+const mapStateToProps = state => ({
+  user: state.user
+})
+
+const mapDispatchToProps = dispatch => ({
+  dispatch: dispatch
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(Login)
